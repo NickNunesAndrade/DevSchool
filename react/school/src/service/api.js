@@ -1,10 +1,10 @@
 import axios from 'axios';
 const api = axios.create({
-    baseURL: 'http://localhost:3001'
+    baseURL: 'http://localhost:3030/'
 });
 
 export default class Api {
-    async listarNomes()  {
+    async listar() {
         let r = await api.get('/matricula');
         return r.data;
     }
@@ -15,14 +15,8 @@ export default class Api {
     }
 
 
-    async editar(nome, chamda, curso, turma, id) {
-        let aluno = {
-            nm_aluno: nome,
-            nr_chamada: chamda,
-            nm_curso: curso,
-            nm_turma: turma     
-        }
-        let editar = await api.put(`/matricula/${id}`, aluno);
+    async editar(nome, chamada, curso, turma, id) {
+        let editar = await api.put(`/matricula/${id}`,{nome, chamada, curso, turma});
         return editar.data;
     }
 
