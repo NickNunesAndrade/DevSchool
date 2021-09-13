@@ -1,9 +1,18 @@
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+
+import LoadingBar from 'react-top-loading-bar';
+
 import Cabecalho from '../../components/cabecalho'
 import Menu from '../../components/menu'
 
 import { Container, Conteudo } from './styled'
+import { useState, useEffect, useRef, React } from 'react';
+
+import { confirmAlert } from 'react-confirm-alert';
+
+
 import Api from '../../service/api.js';
-import { useState, useEffect } from 'react';
 const api = new Api();
 
 
@@ -14,40 +23,35 @@ export default function Index() {
     const [curso, setCurso] = useState('');
     const [turma, setTurma] = useState('');
     const [idAlterando, setIdAlterando] = useState(0);
+    let loading = useRef(null);
     
     async function carregar()  {
+        loading.current.continuousStart();
         let r = await api.listar();
         setAlunos(r);
+        loading.current.complete();
     }
 
     async function criar() {
         if(idAlterando === 0) {
+            loading.current.continuousStart();
             let aluno = await api.adicionar(nome, chamada, curso, turma);
-
-            if(nome === "") {
-                alert('O campo nome e obrigatorio !!');
-            } else if(chamada === "") {
-                alert('O campo chamada e obrigatorio !!');
-            } else if(curso === "") {
-                alert('O campo curso e obrigatorio !!');
-            } else if(turma === "") {
-                alert('O campo turma e obrigatorio !!');
-            } else if(chamada <= 0) {
-                alert('A chamada nao pode ter numero negativo !!');
-            } else {
-                carregar();
-            }
+            toast.success('💕 Aluno cadastrado !!');
+            loading.current.complete();
+            carregar();
 
             if(aluno.erro) {
-                alert(aluno.erro);
+                toast.error(aluno.erro);
             }
 
         } else {
+            loading.current.continuousStart();
             let edita = await api.editar(idAlterando, nome, chamada, curso, turma);
             if(edita.erro) {
-                alert(edita.erro);
+                toast.error(edita.erro);
             } else {
-                alert('Aluno alterado !!');
+                toast.success('💕 Aluno alterado !!');
+                loading.current.complete();
             }
         }
         limpar();
@@ -62,10 +66,31 @@ export default function Index() {
         setIdAlterando(0);
     }
 
-    async function remover(id) {
-        let remove = await api.remover(id);
-        alert('Aluno removido !!');
-        carregar();
+    function remover(id) {
+        loading.current.continuousStart();
+
+        confirmAlert({
+            title: 'Remover o aluno',
+            message: `Tem certeza que deseja excluir o aluno  ${id}`,
+            buttons: [
+                {
+                    label: 'Sim',
+                    onClick: async () => {
+                        let excluir = await api.remover(id);
+                        if(excluir.erro) {
+                            toast.error(`${excluir.erro}`);
+                        } else {
+                            toast.success('💕 Aluno removido !!');
+                            carregar();
+                        }
+                    }
+                },
+                {
+                    label: 'Nao'
+                }
+            ]
+        })
+        loading.current.complete();
     }
 
     async function editar(item) {
@@ -81,6 +106,8 @@ export default function Index() {
     }, []);
     return (
         <Container>
+            <LoadingBar color="#EA10C7"  height={6}  ref={loading} />
+            <ToastContainer />
             <Menu />
             <Conteudo>
                 <Cabecalho />
