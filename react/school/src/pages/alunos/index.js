@@ -1,17 +1,11 @@
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 import LoadingBar from 'react-top-loading-bar';
-
 import Cabecalho from '../../components/cabecalho'
 import Menu from '../../components/menu'
-
 import { Container, Conteudo } from './styled'
 import { useState, useEffect, useRef, React } from 'react';
-
 import { confirmAlert } from 'react-confirm-alert';
-
-
 import Api from '../../service/api.js';
 const api = new Api();
 
@@ -34,24 +28,23 @@ export default function Index() {
 
     async function criar() {
         if(idAlterando === 0) {
-            loading.current.continuousStart();
+
             let aluno = await api.adicionar(nome, chamada, curso, turma);
-            toast.success('💕 Aluno cadastrado !!');
-            loading.current.complete();
             carregar();
 
             if(aluno.erro) {
-                toast.error(aluno.erro);
+                toast.error(`${aluno.erro}`);
+            } else {
+                toast.success('Aluno Inserido !!');
             }
 
         } else {
-            loading.current.continuousStart();
+            
             let edita = await api.editar(idAlterando, nome, chamada, curso, turma);
             if(edita.erro) {
-                toast.error(edita.erro);
+                toast.error(`${edita.erro}`);
             } else {
                 toast.success('💕 Aluno alterado !!');
-                loading.current.complete();
             }
         }
         limpar();
@@ -77,10 +70,11 @@ export default function Index() {
                     label: 'Sim',
                     onClick: async () => {
                         let excluir = await api.remover(id);
+
                         if(excluir.erro) {
                             toast.error(`${excluir.erro}`);
                         } else {
-                            toast.success('💕 Aluno removido !!');
+                            toast.success(`💕 Aluno removido !!`);
                             carregar();
                         }
                     }
@@ -107,7 +101,8 @@ export default function Index() {
     return (
         <Container>
             <LoadingBar color="#EA10C7"  height={6}  ref={loading} />
-            <ToastContainer />
+            <div><ToastContainer /></div>
+
             <Menu />
             <Conteudo>
                 <Cabecalho />
@@ -181,5 +176,6 @@ export default function Index() {
                 </div>
             </Conteudo>
         </Container>
-    )
+    );
 }
+
