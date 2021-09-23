@@ -1,11 +1,12 @@
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'react-toastify/dist/ReactToastify.css';
 import LoadingBar from 'react-top-loading-bar';
 import Cabecalho from '../../components/cabecalho'
 import Menu from '../../components/menu'
 import { Container, Conteudo } from './styled'
 import { useState, useEffect, useRef, React } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 import Api from '../../service/api.js';
 const api = new Api();
 
@@ -100,8 +101,9 @@ export default function Index() {
     }, []);
     return (
         <Container>
+            <ToastContainer />
             <LoadingBar color="#EA10C7"  height={6}  ref={loading} />
-            <div><ToastContainer /></div>
+
 
             <Menu />
             <Conteudo>
@@ -159,7 +161,7 @@ export default function Index() {
                                 {alunos.map((item, i) => 
                                     <tr className= {i % 2 === 0 ? "linha-alternada" : ""}>
                                         <td>{item.id_matricula}</td>
-                                        <td title={item.nm_aluno}> {item.nm_aluno != null && item.nm_aluno.length >= 25
+                                        <td title={item.nm_aluno}> {item.nm_aluno !== null && item.nm_aluno.length >= 25
                                                 ? item.nm_aluno.substr(0, 25) + "..."
                                                 : item.nm_aluno} 
                                          </td>
